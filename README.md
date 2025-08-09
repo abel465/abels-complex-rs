@@ -3,6 +3,7 @@ Complex numbers with rectangular and polar representations
 
 ### design decisions
 ComplexPolar does not implicitly normalize (|z| >= 0 and -PI < Arg(z) >=PI)
+
 no implicit conversions between rectangular and polar forms just to get back the original type
 
 ### `no_std` support
