@@ -70,10 +70,16 @@ impl ComplexPolar {
     }
 
     pub fn powf(self, x: f32) -> Self {
+        if x < 0.0 && self.abs == 0.0 {
+            return ComplexPolar::ZERO;
+        }
         complex_polar(self.abs.powf(x), self.arg * x)
     }
 
     pub fn powi(self, n: i32) -> Self {
+        if n < 0 && self.abs == 0.0 {
+            return ComplexPolar::ZERO;
+        }
         complex_polar(self.abs.powi(n), self.arg * n as f32)
     }
 
