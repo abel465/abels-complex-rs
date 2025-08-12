@@ -207,7 +207,7 @@ impl MulAssign<f32> for Complex {
 impl Div for Complex {
     type Output = Self;
     fn div(self, other: Self) -> Self::Output {
-        self * other.conjugate() / other.abs_sq()
+        self * other.recip()
     }
 }
 
@@ -222,7 +222,7 @@ impl Div<f32> for Complex {
 impl Div<Complex> for f32 {
     type Output = Complex;
     fn div(self, other: Complex) -> Self::Output {
-        self * other.conjugate() / other.abs_sq()
+        self * other.recip()
     }
 }
 
@@ -501,7 +501,7 @@ mod tests {
                 z /= z1.re;
                 assert_eq!(z, z0 / z1.re);
             }
-            assert_eq!(z0 / z0, Complex::ONE);
+            assert_ulps_eq!(z0 / z0, Complex::ONE);
             assert_eq!(Complex::ZERO / z0, Complex::ZERO);
         }
     }

@@ -166,14 +166,13 @@ impl Div<f32> for ComplexPolar {
 impl Div<ComplexPolar> for f32 {
     type Output = ComplexPolar;
     fn div(self, other: ComplexPolar) -> Self::Output {
-        self * other.conjugate() / other.abs_sq()
+        self * other.recip()
     }
 }
 
 impl DivAssign for ComplexPolar {
     fn div_assign(&mut self, other: Self) {
-        *self *= other.conjugate();
-        *self /= other.abs_sq();
+        *self *= other.recip();
     }
 }
 
@@ -354,7 +353,7 @@ mod tests {
                 z /= z1.re();
                 assert_eq!(z, z0 / z1.re());
             }
-            assert_eq!(z0 / z0, ComplexPolar::ONE);
+            assert_ulps_eq!(z0 / z0, ComplexPolar::ONE);
             assert_eq!((ComplexPolar::ZERO / z0).abs, 0.0);
         }
     }
