@@ -49,7 +49,7 @@ impl ComplexPolar {
     }
 
     pub fn recip(self) -> Self {
-        self.conjugate() / self.abs_sq()
+        complex_polar(self.abs.recip(), -self.arg)
     }
 
     pub fn sqrt(self) -> Self {
@@ -275,9 +275,9 @@ mod tests {
     use approx::*;
     use core::f32::consts::{E, FRAC_PI_2, PI};
     use rand::{
-        distr::{uniform::*, Distribution, StandardUniform, Uniform},
-        rngs::StdRng,
         Rng, SeedableRng,
+        distr::{Distribution, StandardUniform, Uniform, uniform::*},
+        rngs::StdRng,
     };
 
     const NUM_SAMPLES: usize = 100;
@@ -370,7 +370,7 @@ mod tests {
     #[test]
     fn reciprocal() {
         for z in random_samples::<ComplexPolar>() {
-            assert_eq!(z.recip(), 1.0 / z);
+            assert_ulps_eq!(z.recip(), 1.0 / z);
             assert_ulps_eq!(z * z.recip(), ComplexPolar::ONE);
         }
         assert_eq!(ComplexPolar::ONE.recip(), ComplexPolar::ONE);
