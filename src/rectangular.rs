@@ -85,6 +85,11 @@ impl Complex {
     pub fn distance_squared(self, other: Self) -> f32 {
         (self - other).abs_sq()
     }
+
+    #[cfg(feature = "glam")]
+    pub fn as_vec2(self) -> glam::Vec2 {
+        glam::vec2(self.re, self.im)
+    }
 }
 
 impl Add for Complex {
@@ -342,7 +347,7 @@ impl From<glam::Vec2> for Complex {
 #[cfg(feature = "glam")]
 impl From<Complex> for glam::Vec2 {
     fn from(z: Complex) -> Self {
-        glam::vec2(z.re, z.im)
+        z.as_vec2()
     }
 }
 
@@ -353,9 +358,9 @@ mod tests {
     use core::f32::consts::{E, FRAC_PI_2, PI, SQRT_2};
     use core::iter::Iterator;
     use rand::{
+        Rng, SeedableRng,
         distr::{Distribution, StandardUniform},
         rngs::StdRng,
-        Rng, SeedableRng,
     };
 
     const NUM_SAMPLES: usize = 100;
