@@ -12,6 +12,7 @@ pub const fn complex(re: f32, im: f32) -> Complex {
     Complex::new(re, im)
 }
 
+/// A complex number in rectangular form.
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(C)]
 pub struct Complex {
@@ -26,30 +27,39 @@ impl Complex {
     pub const I: Self = complex(0.0, 1.0);
     pub const NEG_I: Self = complex(0.0, -1.0);
 
+    /// Creates a complex number.
     pub const fn new(re: f32, im: f32) -> Self {
         Self { re, im }
     }
 
+    /// Computes the conjugate.
     pub const fn conjugate(self) -> Self {
         complex(self.re, -self.im)
     }
 
+    /// Computes the absolute value.
     pub fn abs(self) -> f32 {
         self.abs_sq().sqrt()
     }
 
+    /// Computes the squared absolute value.
+    ///
+    /// This is faster than `abs()` as it avoids a square root operation.
     pub fn abs_sq(self) -> f32 {
         self.re * self.re + self.im * self.im
     }
 
+    /// Computes the argument in the range `(-π, +π]`.
     pub fn arg(self) -> f32 {
         self.im.atan2(self.re)
     }
 
+    /// Computes the reciprocal.
     pub fn recip(self) -> Self {
         self.conjugate() / self.abs_sq()
     }
 
+    /// Computes the principle square root.
     pub fn sqrt(self) -> Self {
         let abs = self.abs();
         complex(
@@ -58,34 +68,42 @@ impl Complex {
         )
     }
 
+    /// Convert to polar form.
     pub fn to_polar(self) -> ComplexPolar {
         complex_polar(self.abs(), self.arg())
     }
 
+    /// Computes `e^self` where `e` is the base of the natural logarithm.
     pub fn exp(self) -> ComplexPolar {
         complex_polar(self.re.exp(), self.im)
     }
 
+    /// Computes the principle natural logarithm.
     pub fn ln(self) -> Self {
         self.to_polar().ln()
     }
 
+    /// Raises `self` to an integer power.
     pub fn powi(self, n: i32) -> ComplexPolar {
         self.to_polar().powi(n)
     }
 
+    /// Raises `self` to a floating point power.
     pub fn powf(self, x: f32) -> ComplexPolar {
         self.to_polar().powf(x)
     }
 
+    /// Computes the euclidian distance between two points.
     pub fn distance(self, other: Self) -> f32 {
         (self - other).abs()
     }
 
+    /// Computes the squared euclidian distance between two points.
     pub fn distance_squared(self, other: Self) -> f32 {
         (self - other).abs_sq()
     }
 
+    /// Casts to a glam::Vec2.
     #[cfg(feature = "glam")]
     pub fn as_vec2(self) -> glam::Vec2 {
         glam::vec2(self.re, self.im)

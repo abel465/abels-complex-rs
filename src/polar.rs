@@ -14,6 +14,7 @@ pub const fn complex_polar(abs: f32, arg: f32) -> ComplexPolar {
     ComplexPolar::new(abs, arg)
 }
 
+/// A complex number in polar form.
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(C)]
 pub struct ComplexPolar {
@@ -28,47 +29,58 @@ impl ComplexPolar {
     pub const NEG_ONE: Self = complex_polar(1.0, PI);
     pub const NEG_I: Self = complex_polar(1.0, -FRAC_PI_2);
 
+    /// Creates a complex number.
     pub const fn new(abs: f32, arg: f32) -> Self {
         Self { abs, arg }
     }
 
+    /// Computes the conjugate.
     pub const fn conjugate(self) -> Self {
         complex_polar(self.abs, -self.arg)
     }
 
+    /// Computes the real component.
     pub fn re(self) -> f32 {
         self.abs * self.arg.cos()
     }
 
+    /// Computes the imaginary component.
     pub fn im(self) -> f32 {
         self.abs * self.arg.sin()
     }
 
+    /// Computes the squared absolute value.
     pub const fn abs_sq(self) -> f32 {
         self.abs * self.abs
     }
 
+    /// Computes the reciprocal.
     pub fn recip(self) -> Self {
         complex_polar(self.abs.recip(), -self.arg)
     }
 
+    /// Computes the principle square root.
     pub fn sqrt(self) -> Self {
         complex_polar(self.abs.sqrt(), self.arg / 2.0)
     }
 
+    /// Convert to rectangular form.
     pub fn to_rectangular(self) -> Complex {
         let (sin, cos) = self.arg.sin_cos();
         self.abs * complex(cos, sin)
     }
 
+    /// Computes `e^self` where `e` is the base of the natural logarithm.
     pub fn exp(self) -> Self {
         self.to_rectangular().exp()
     }
 
+    /// Computes the principle natural logarithm.
     pub fn ln(self) -> Complex {
         complex(self.abs.ln(), self.arg)
     }
 
+    /// Raises `self` to a floating point power.
     pub fn powf(self, x: f32) -> Self {
         if x < 0.0 && self.abs == 0.0 {
             return ComplexPolar::ZERO;
@@ -76,6 +88,7 @@ impl ComplexPolar {
         complex_polar(self.abs.powf(x), self.arg * x)
     }
 
+    /// Raises `self` to an integer power.
     pub fn powi(self, n: i32) -> Self {
         if n < 0 && self.abs == 0.0 {
             return ComplexPolar::ZERO;
@@ -83,6 +96,7 @@ impl ComplexPolar {
         complex_polar(self.abs.powi(n), self.arg * n as f32)
     }
 
+    /// Normalizes the absolute value and the argument into the range `[0, ∞)` and `(-π, +π]` respectively.
     pub fn normalize(mut self) -> Self {
         #[cfg(feature = "libm")]
         {
