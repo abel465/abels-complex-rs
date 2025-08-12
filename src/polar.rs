@@ -37,11 +37,11 @@ impl ComplexPolar {
     }
 
     pub fn re(self) -> f32 {
-        self.to_rectangular().re
+        self.abs * self.arg.cos()
     }
 
     pub fn im(self) -> f32 {
-        self.to_rectangular().im
+        self.abs * self.arg.sin()
     }
 
     pub const fn abs_sq(self) -> f32 {
