@@ -1,4 +1,4 @@
-use core::f32::consts::{FRAC_PI_2, PI, TAU};
+use core::f32::consts::{FRAC_PI_2, LN_2, LN_10, PI, TAU};
 use core::fmt;
 use core::ops::*;
 use core::write;
@@ -78,6 +78,16 @@ impl ComplexPolar {
     /// Computes the principle natural logarithm.
     pub fn ln(self) -> Complex {
         complex(self.abs.ln(), self.arg)
+    }
+
+    /// Computes the principle logarithm in base 2.
+    pub fn log2(self) -> Complex {
+        self.ln() / LN_2
+    }
+
+    /// Computes the principle logarithm in base 10.
+    pub fn log10(self) -> Complex {
+        self.ln() / LN_10
     }
 
     /// Raises `self` to a floating point power.
@@ -465,6 +475,10 @@ mod tests {
         assert_eq!(ComplexPolar::I.ln(), Complex::I * FRAC_PI_2);
         assert_eq!(ComplexPolar::NEG_ONE.ln(), Complex::I * PI);
         assert_eq!(ComplexPolar::NEG_I.ln(), Complex::I * -FRAC_PI_2);
+
+        assert_ulps_eq!(complex_polar(E, 0.0).ln(), Complex::ONE);
+        assert_ulps_eq!(complex_polar(2.0, 0.0).log2(), Complex::ONE);
+        assert_ulps_eq!(complex_polar(10.0, 0.0).log10(), Complex::ONE);
     }
 
     #[test]

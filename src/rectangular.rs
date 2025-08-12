@@ -1,4 +1,5 @@
 use crate::polar::*;
+use core::f32::consts::{LN_2, LN_10};
 use core::fmt;
 use core::ops::*;
 use core::write;
@@ -81,6 +82,16 @@ impl Complex {
     /// Computes the principle natural logarithm.
     pub fn ln(self) -> Self {
         self.to_polar().ln()
+    }
+
+    /// Computes the principle logarithm in base 2.
+    pub fn log2(self) -> Self {
+        self.ln() / LN_2
+    }
+
+    /// Computes the principle logarithm in base 10.
+    pub fn log10(self) -> Self {
+        self.ln() / LN_10
     }
 
     /// Raises `self` to an integer power.
@@ -624,6 +635,10 @@ mod tests {
         assert_eq!(Complex::I.ln(), Complex::I * FRAC_PI_2);
         assert_eq!(Complex::NEG_ONE.ln(), Complex::I * PI);
         assert_eq!(Complex::NEG_I.ln(), Complex::I * -FRAC_PI_2);
+
+        assert_ulps_eq!(complex(E, 0.0).ln(), Complex::ONE);
+        assert_ulps_eq!(complex(2.0, 0.0).log2(), Complex::ONE);
+        assert_ulps_eq!(complex(10.0, 0.0).log10(), Complex::ONE);
     }
 
     #[test]
