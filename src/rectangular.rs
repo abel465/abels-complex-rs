@@ -66,8 +66,8 @@ impl Complex {
         complex_polar(self.re.exp(), self.im)
     }
 
-    pub fn log(self) -> Self {
-        self.to_polar().log()
+    pub fn ln(self) -> Self {
+        self.to_polar().ln()
     }
 
     pub fn powi(self, n: i32) -> ComplexPolar {
@@ -587,7 +587,7 @@ mod tests {
         for z in random_samples::<Complex>() {
             assert_eq!(z.exp().abs, z.re.exp());
             assert_eq!(z.exp().arg, z.im);
-            assert_ulps_eq!(z.exp().log(), z);
+            assert_ulps_eq!(z.exp().ln(), z);
         }
         assert_eq!(Complex::ONE.exp(), complex_polar(E, 0.0));
         assert_eq!(Complex::I.exp(), complex_polar(1.0, 1.0));
@@ -598,14 +598,14 @@ mod tests {
     #[test]
     fn log() {
         for z in random_samples::<Complex>() {
-            assert_eq!(z.log().re, z.abs().ln());
-            assert_eq!(z.log().im, z.arg());
-            assert_ulps_eq!(z.log().exp(), z.to_polar());
+            assert_eq!(z.ln().re, z.abs().ln());
+            assert_eq!(z.ln().im, z.arg());
+            assert_ulps_eq!(z.ln().exp(), z.to_polar());
         }
-        assert_eq!(Complex::ONE.log(), Complex::ZERO);
-        assert_eq!(Complex::I.log(), Complex::I * FRAC_PI_2);
-        assert_eq!(Complex::NEG_ONE.log(), Complex::I * PI);
-        assert_eq!(Complex::NEG_I.log(), Complex::I * -FRAC_PI_2);
+        assert_eq!(Complex::ONE.ln(), Complex::ZERO);
+        assert_eq!(Complex::I.ln(), Complex::I * FRAC_PI_2);
+        assert_eq!(Complex::NEG_ONE.ln(), Complex::I * PI);
+        assert_eq!(Complex::NEG_I.ln(), Complex::I * -FRAC_PI_2);
     }
 
     #[test]

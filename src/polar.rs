@@ -65,7 +65,7 @@ impl ComplexPolar {
         self.to_rectangular().exp()
     }
 
-    pub fn log(self) -> Complex {
+    pub fn ln(self) -> Complex {
         complex(self.abs.ln(), self.arg)
     }
 
@@ -433,7 +433,7 @@ mod tests {
         for z in random_samples::<ComplexPolar>() {
             assert_eq!(z.exp().abs, z.re().exp());
             assert_eq!(z.exp().arg, z.im());
-            assert_ulps_eq!(z.exp().log(), z.to_rectangular());
+            assert_ulps_eq!(z.exp().ln(), z.to_rectangular());
         }
         assert_ulps_eq!(ComplexPolar::ONE.exp(), complex_polar(E, 0.0));
         assert_ulps_eq!(ComplexPolar::I.exp(), complex_polar(1.0, 1.0));
@@ -444,14 +444,14 @@ mod tests {
     #[test]
     fn log() {
         for z in random_samples::<ComplexPolar>() {
-            assert_eq!(z.log().re, z.abs.ln());
-            assert_eq!(z.log().im, z.arg);
-            assert_ulps_eq!(z.log().exp(), z);
+            assert_eq!(z.ln().re, z.abs.ln());
+            assert_eq!(z.ln().im, z.arg);
+            assert_ulps_eq!(z.ln().exp(), z);
         }
-        assert_eq!(ComplexPolar::ONE.log(), Complex::ZERO);
-        assert_eq!(ComplexPolar::I.log(), Complex::I * FRAC_PI_2);
-        assert_eq!(ComplexPolar::NEG_ONE.log(), Complex::I * PI);
-        assert_eq!(ComplexPolar::NEG_I.log(), Complex::I * -FRAC_PI_2);
+        assert_eq!(ComplexPolar::ONE.ln(), Complex::ZERO);
+        assert_eq!(ComplexPolar::I.ln(), Complex::I * FRAC_PI_2);
+        assert_eq!(ComplexPolar::NEG_ONE.ln(), Complex::I * PI);
+        assert_eq!(ComplexPolar::NEG_I.ln(), Complex::I * -FRAC_PI_2);
     }
 
     #[test]
