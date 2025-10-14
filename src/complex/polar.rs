@@ -5,7 +5,7 @@ use core::write;
 #[cfg(feature = "libm")]
 use num_traits::real::Real;
 
-use crate::rectangular::*;
+type Rectangular = super::rectangular::Complex;
 
 /// Creates a complex number in polar form.
 #[inline(always)]
@@ -23,11 +23,11 @@ pub struct ComplexPolar {
 }
 
 impl ComplexPolar {
-    pub const ZERO: Self = complex_polar(0.0, 0.0);
-    pub const ONE: Self = complex_polar(1.0, 0.0);
-    pub const I: Self = complex_polar(1.0, FRAC_PI_2);
-    pub const NEG_ONE: Self = complex_polar(1.0, PI);
-    pub const NEG_I: Self = complex_polar(1.0, -FRAC_PI_2);
+    pub const ZERO: Self = Self::new(0.0, 0.0);
+    pub const ONE: Self = Self::new(1.0, 0.0);
+    pub const I: Self = Self::new(1.0, FRAC_PI_2);
+    pub const NEG_ONE: Self = Self::new(1.0, PI);
+    pub const NEG_I: Self = Self::new(1.0, -FRAC_PI_2);
 
     /// Creates a complex number.
     pub const fn new(abs: f32, arg: f32) -> Self {
@@ -36,7 +36,7 @@ impl ComplexPolar {
 
     /// Computes the conjugate.
     pub const fn conjugate(self) -> Self {
-        complex_polar(self.abs, -self.arg)
+        Self::new(self.abs, -self.arg)
     }
 
     /// Computes the real component.
@@ -56,18 +56,18 @@ impl ComplexPolar {
 
     /// Computes the reciprocal.
     pub fn recip(self) -> Self {
-        complex_polar(self.abs.recip(), -self.arg)
+        Self::new(self.abs.recip(), -self.arg)
     }
 
     /// Computes the principle square root.
     pub fn sqrt(self) -> Self {
-        complex_polar(self.abs.sqrt(), self.arg / 2.0)
+        Self::new(self.abs.sqrt(), self.arg / 2.0)
     }
 
     /// Convert to rectangular form.
-    pub fn to_rectangular(self) -> Complex {
+    pub fn to_rectangular(self) -> Rectangular {
         let (sin, cos) = self.arg.sin_cos();
-        self.abs * complex(cos, sin)
+        self.abs * Rectangular::new(cos, sin)
     }
 
     /// Computes `e^self` where `e` is the base of the natural logarithm.
@@ -76,17 +76,17 @@ impl ComplexPolar {
     }
 
     /// Computes the principle natural logarithm.
-    pub fn ln(self) -> Complex {
-        complex(self.abs.ln(), self.arg)
+    pub fn ln(self) -> Rectangular {
+        Rectangular::new(self.abs.ln(), self.arg)
     }
 
     /// Computes the principle logarithm in base 2.
-    pub fn log2(self) -> Complex {
+    pub fn log2(self) -> Rectangular {
         self.ln() / LN_2
     }
 
     /// Computes the principle logarithm in base 10.
-    pub fn log10(self) -> Complex {
+    pub fn log10(self) -> Rectangular {
         self.ln() / LN_10
     }
 
@@ -95,7 +95,7 @@ impl ComplexPolar {
         if x < 0.0 && self.abs == 0.0 {
             return ComplexPolar::ZERO;
         }
-        complex_polar(self.abs.powf(x), self.arg * x)
+        Self::new(self.abs.powf(x), self.arg * x)
     }
 
     /// Raises `self` to an integer power.
@@ -103,7 +103,7 @@ impl ComplexPolar {
         if n < 0 && self.abs == 0.0 {
             return ComplexPolar::ZERO;
         }
-        complex_polar(self.abs.powi(n), self.arg * n as f32)
+        Self::new(self.abs.powi(n), self.arg * n as f32)
     }
 
     /// Normalizes the absolute value and the argument into the range `[0, ∞)` and `(-π, +π]` respectively.
@@ -240,7 +240,7 @@ impl fmt::Display for ComplexPolar {
 #[cfg(feature = "rand")]
 impl rand::distr::Distribution<ComplexPolar> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> ComplexPolar {
-        complex_polar(self.sample(rng), rng.random_range((-PI).next_up()..=PI))
+        ComplexPolar::new(self.sample(rng), rng.random_range((-PI).next_up()..=PI))
     }
 }
 
@@ -288,7 +288,7 @@ impl UlpsEq for ComplexPolar {
 
 impl From<f32> for ComplexPolar {
     fn from(value: f32) -> Self {
-        complex_polar(value, 0.0)
+        Self::new(value, 0.0)
     }
 }
 
@@ -458,10 +458,10 @@ mod tests {
             assert_eq!(z.exp().arg, z.im());
             assert_ulps_eq!(z.exp().ln(), z.to_rectangular());
         }
-        assert_ulps_eq!(ComplexPolar::ONE.exp(), complex_polar(E, 0.0));
-        assert_ulps_eq!(ComplexPolar::I.exp(), complex_polar(1.0, 1.0));
-        assert_ulps_eq!(ComplexPolar::NEG_ONE.exp(), complex_polar(E.recip(), 0.0));
-        assert_ulps_eq!(ComplexPolar::NEG_I.exp(), complex_polar(1.0, -1.0));
+        assert_ulps_eq!(ComplexPolar::ONE.exp(), ComplexPolar::new(E, 0.0));
+        assert_ulps_eq!(ComplexPolar::I.exp(), ComplexPolar::new(1.0, 1.0));
+        assert_ulps_eq!(ComplexPolar::NEG_ONE.exp(), ComplexPolar::new(E.recip(), 0.0));
+        assert_ulps_eq!(ComplexPolar::NEG_I.exp(), ComplexPolar::new(1.0, -1.0));
     }
 
     #[test]
@@ -471,14 +471,14 @@ mod tests {
             assert_eq!(z.ln().im, z.arg);
             assert_ulps_eq!(z.ln().exp(), z);
         }
-        assert_eq!(ComplexPolar::ONE.ln(), Complex::ZERO);
-        assert_eq!(ComplexPolar::I.ln(), Complex::I * FRAC_PI_2);
-        assert_eq!(ComplexPolar::NEG_ONE.ln(), Complex::I * PI);
-        assert_eq!(ComplexPolar::NEG_I.ln(), Complex::I * -FRAC_PI_2);
+        assert_eq!(ComplexPolar::ONE.ln(), Rectangular::ZERO);
+        assert_eq!(ComplexPolar::I.ln(), Rectangular::I * FRAC_PI_2);
+        assert_eq!(ComplexPolar::NEG_ONE.ln(), Rectangular::I * PI);
+        assert_eq!(ComplexPolar::NEG_I.ln(), Rectangular::I * -FRAC_PI_2);
 
-        assert_ulps_eq!(complex_polar(E, 0.0).ln(), Complex::ONE);
-        assert_ulps_eq!(complex_polar(2.0, 0.0).log2(), Complex::ONE);
-        assert_ulps_eq!(complex_polar(10.0, 0.0).log10(), Complex::ONE);
+        assert_ulps_eq!(ComplexPolar::new(E, 0.0).ln(), Rectangular::ONE);
+        assert_ulps_eq!(ComplexPolar::new(2.0, 0.0).log2(), Rectangular::ONE);
+        assert_ulps_eq!(ComplexPolar::new(10.0, 0.0).log10(), Rectangular::ONE);
     }
 
     #[test]
@@ -519,12 +519,12 @@ mod tests {
     fn normalize() {
         for z in random_samples::<ComplexPolar>() {
             for n in uniform_samples::<i32>(-99, 99) {
-                let w = complex_polar(z.abs, z.arg + n as f32 * TAU);
+                let w = ComplexPolar::new(z.abs, z.arg + n as f32 * TAU);
                 assert_ulps_eq!(z, w.normalize(), epsilon = 2000.0 * f32::EPSILON);
 
                 assert_ulps_eq!(
-                    complex_polar(-z.abs, z.arg).normalize(),
-                    complex_polar(z.abs, z.arg + PI).normalize(),
+                    ComplexPolar::new(-z.abs, z.arg).normalize(),
+                    ComplexPolar::new(z.abs, z.arg + PI).normalize(),
                     epsilon = 2000.0 * f32::EPSILON
                 );
             }

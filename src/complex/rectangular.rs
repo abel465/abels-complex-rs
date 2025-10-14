@@ -1,10 +1,11 @@
-use crate::polar::*;
 use core::f32::consts::{LN_2, LN_10};
 use core::fmt;
 use core::ops::*;
 use core::write;
 #[cfg(feature = "libm")]
 use num_traits::real::Real;
+
+type Polar = super::polar::ComplexPolar;
 
 /// Creates a complex number in rectangular form.
 #[inline(always)]
@@ -22,11 +23,11 @@ pub struct Complex {
 }
 
 impl Complex {
-    pub const ZERO: Self = complex(0.0, 0.0);
-    pub const ONE: Self = complex(1.0, 0.0);
-    pub const NEG_ONE: Self = complex(-1.0, 0.0);
-    pub const I: Self = complex(0.0, 1.0);
-    pub const NEG_I: Self = complex(0.0, -1.0);
+    pub const ZERO: Self = Self::new(0.0, 0.0);
+    pub const ONE: Self = Self::new(1.0, 0.0);
+    pub const NEG_ONE: Self = Self::new(-1.0, 0.0);
+    pub const I: Self = Self::new(0.0, 1.0);
+    pub const NEG_I: Self = Self::new(0.0, -1.0);
 
     /// Creates a complex number.
     pub const fn new(re: f32, im: f32) -> Self {
@@ -35,7 +36,7 @@ impl Complex {
 
     /// Computes the conjugate.
     pub const fn conjugate(self) -> Self {
-        complex(self.re, -self.im)
+        Self::new(self.re, -self.im)
     }
 
     /// Computes the absolute value.
@@ -63,20 +64,20 @@ impl Complex {
     /// Computes the principle square root.
     pub fn sqrt(self) -> Self {
         let abs = self.abs();
-        complex(
+        Self::new(
             (0.5 * (abs + self.re)).sqrt(),
             (0.5 * (abs - self.re)).sqrt().copysign(self.im),
         )
     }
 
     /// Convert to polar form.
-    pub fn to_polar(self) -> ComplexPolar {
-        complex_polar(self.abs(), self.arg())
+    pub fn to_polar(self) -> Polar {
+        Polar::new(self.abs(), self.arg())
     }
 
     /// Computes `e^self` where `e` is the base of the natural logarithm.
-    pub fn exp(self) -> ComplexPolar {
-        complex_polar(self.re.exp(), self.im)
+    pub fn exp(self) -> Polar {
+        Polar::new(self.re.exp(), self.im)
     }
 
     /// Computes the principle natural logarithm.
@@ -95,12 +96,12 @@ impl Complex {
     }
 
     /// Raises `self` to an integer power.
-    pub fn powi(self, n: i32) -> ComplexPolar {
+    pub fn powi(self, n: i32) -> Polar {
         self.to_polar().powi(n)
     }
 
     /// Raises `self` to a floating point power.
-    pub fn powf(self, x: f32) -> ComplexPolar {
+    pub fn powf(self, x: f32) -> Polar {
         self.to_polar().powf(x)
     }
 
@@ -177,7 +178,7 @@ impl Sub<f32> for Complex {
 impl Sub<Complex> for f32 {
     type Output = Complex;
     fn sub(self, z: Complex) -> Self::Output {
-        complex(self - z.re, -z.im)
+        Complex::new(self - z.re, -z.im)
     }
 }
 
@@ -271,7 +272,7 @@ impl DivAssign<f32> for Complex {
 impl Neg for Complex {
     type Output = Self;
     fn neg(self) -> Self::Output {
-        complex(-self.re, -self.im)
+        Self::new(-self.re, -self.im)
     }
 }
 
@@ -314,7 +315,7 @@ impl fmt::Display for Complex {
 #[cfg(feature = "rand")]
 impl rand::distr::Distribution<Complex> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Complex {
-        rng.sample::<ComplexPolar, _>(self).to_rectangular()
+        rng.sample::<Polar, _>(self).to_rectangular()
     }
 }
 
@@ -362,14 +363,14 @@ impl UlpsEq for Complex {
 
 impl From<f32> for Complex {
     fn from(value: f32) -> Self {
-        complex(value, 0.0)
+        Self::new(value, 0.0)
     }
 }
 
 #[cfg(feature = "glam")]
 impl From<glam::Vec2> for Complex {
     fn from(v: glam::Vec2) -> Self {
-        complex(v.x, v.y)
+        Self::new(v.x, v.y)
     }
 }
 
@@ -538,7 +539,7 @@ mod tests {
     #[test]
     fn negation() {
         for z in random_samples::<Complex>() {
-            assert_eq!(-z, complex(-z.re, -z.im));
+            assert_eq!(-z, Complex::new(-z.re, -z.im));
         }
         assert_eq!(-Complex::ONE, Complex::NEG_ONE);
         assert_eq!(-Complex::I, Complex::NEG_I);
@@ -570,8 +571,8 @@ mod tests {
         }
         assert_eq!(Complex::ONE.sqrt(), Complex::ONE);
         assert_eq!(Complex::NEG_ONE.sqrt(), Complex::I);
-        assert_eq!(complex(0.0, 2.0).sqrt(), complex(1.0, 1.0));
-        assert_eq!(complex(0.0, -2.0).sqrt(), complex(1.0, -1.0));
+        assert_eq!(Complex::new(0.0, 2.0).sqrt(), Complex::new(1.0, 1.0));
+        assert_eq!(Complex::new(0.0, -2.0).sqrt(), Complex::new(1.0, -1.0));
     }
 
     #[test]
@@ -584,10 +585,10 @@ mod tests {
         assert_eq!(Complex::I.abs(), 1.0);
         assert_eq!(Complex::NEG_ONE.abs(), 1.0);
         assert_eq!(Complex::NEG_I.abs(), 1.0);
-        assert_eq!(complex(1.0, 1.0).abs(), SQRT_2);
-        assert_eq!(complex(-1.0, 1.0).abs(), SQRT_2);
-        assert_eq!(complex(-1.0, -1.0).abs(), SQRT_2);
-        assert_eq!(complex(1.0, -1.0).abs(), SQRT_2);
+        assert_eq!(Complex::new(1.0, 1.0).abs(), SQRT_2);
+        assert_eq!(Complex::new(-1.0, 1.0).abs(), SQRT_2);
+        assert_eq!(Complex::new(-1.0, -1.0).abs(), SQRT_2);
+        assert_eq!(Complex::new(1.0, -1.0).abs(), SQRT_2);
     }
 
     #[test]
@@ -618,10 +619,10 @@ mod tests {
             assert_eq!(z.exp().arg, z.im);
             assert_ulps_eq!(z.exp().ln(), z);
         }
-        assert_eq!(Complex::ONE.exp(), complex_polar(E, 0.0));
-        assert_eq!(Complex::I.exp(), complex_polar(1.0, 1.0));
-        assert_eq!(Complex::NEG_ONE.exp(), complex_polar(E.recip(), 0.0));
-        assert_eq!(Complex::NEG_I.exp(), complex_polar(1.0, -1.0));
+        assert_eq!(Complex::ONE.exp(), Polar::new(E, 0.0));
+        assert_eq!(Complex::I.exp(), Polar::new(1.0, 1.0));
+        assert_eq!(Complex::NEG_ONE.exp(), Polar::new(E.recip(), 0.0));
+        assert_eq!(Complex::NEG_I.exp(), Polar::new(1.0, -1.0));
     }
 
     #[test]
@@ -636,15 +637,15 @@ mod tests {
         assert_eq!(Complex::NEG_ONE.ln(), Complex::I * PI);
         assert_eq!(Complex::NEG_I.ln(), Complex::I * -FRAC_PI_2);
 
-        assert_ulps_eq!(complex(E, 0.0).ln(), Complex::ONE);
-        assert_ulps_eq!(complex(2.0, 0.0).log2(), Complex::ONE);
-        assert_ulps_eq!(complex(10.0, 0.0).log10(), Complex::ONE);
+        assert_ulps_eq!(Complex::new(E, 0.0).ln(), Complex::ONE);
+        assert_ulps_eq!(Complex::new(2.0, 0.0).log2(), Complex::ONE);
+        assert_ulps_eq!(Complex::new(10.0, 0.0).log10(), Complex::ONE);
     }
 
     #[test]
     fn powi() {
         for z in random_samples::<Complex>() {
-            assert_eq!(z.powi(0), ComplexPolar::ONE);
+            assert_eq!(z.powi(0), Polar::ONE);
             assert_eq!(z.powi(1), z.to_polar());
             for n in random_samples::<i32>() {
                 assert_eq!(z.powi(n).abs, z.abs().powi(n));
@@ -652,15 +653,15 @@ mod tests {
             }
         }
         for n in random_samples::<i32>() {
-            assert_eq!(Complex::ZERO.powi(n.abs()), ComplexPolar::ZERO);
-            assert_eq!(Complex::ONE.powi(n), ComplexPolar::ONE);
+            assert_eq!(Complex::ZERO.powi(n.abs()), Polar::ZERO);
+            assert_eq!(Complex::ONE.powi(n), Polar::ONE);
         }
     }
 
     #[test]
     fn powf() {
         for z in random_samples::<Complex>() {
-            assert_eq!(z.powf(0.0), ComplexPolar::ONE);
+            assert_eq!(z.powf(0.0), Polar::ONE);
             assert_eq!(z.powf(1.0), z.to_polar());
             for n in random_samples::<i32>() {
                 let x = n as f32 * 0.01;
@@ -670,8 +671,8 @@ mod tests {
         }
         for n in random_samples::<i32>() {
             let x = n as f32 * 0.01;
-            assert_eq!(Complex::ZERO.powf(x.abs()), ComplexPolar::ZERO);
-            assert_eq!(Complex::ONE.powf(x), ComplexPolar::ONE);
+            assert_eq!(Complex::ZERO.powf(x.abs()), Polar::ZERO);
+            assert_eq!(Complex::ONE.powf(x), Polar::ONE);
         }
     }
 }
