@@ -1,7 +1,8 @@
 //! Complex numbers with rectangular and polar representations.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+pub mod polar;
+pub mod rectangular;
 
-pub mod f32;
-
-pub use f32::*;
+pub use polar::*;
+pub use rectangular::*;
