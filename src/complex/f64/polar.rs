@@ -1,4 +1,4 @@
-use core::f32::consts::{FRAC_PI_2, LN_2, LN_10, PI, TAU};
+use core::f64::consts::{FRAC_PI_2, LN_2, LN_10, PI, TAU};
 use core::fmt;
 use core::ops::*;
 use core::write;
@@ -7,7 +7,7 @@ use num_traits::real::Real;
 
 type Rectangular = crate::complex::rectangular::Complex<FT>;
 type Polar = crate::complex::polar::ComplexPolar<FT>;
-type FT = f32;
+type FT = f64;
 
 impl Polar {
     pub const ZERO: Self = Self::new(0.0, 0.0);
@@ -278,7 +278,7 @@ impl From<FT> for Polar {
 mod tests {
     use super::*;
     use approx::*;
-    use core::f32::consts::{E, FRAC_PI_2, PI};
+    use core::f64::consts::{E, FRAC_PI_2, PI};
     use rand::{
         Rng, SeedableRng,
         distr::{Distribution, StandardUniform, Uniform, uniform::*},

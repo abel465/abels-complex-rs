@@ -1,4 +1,4 @@
-use core::f32::consts::{LN_2, LN_10};
+use core::f64::consts::{LN_2, LN_10};
 use core::fmt;
 use core::ops::*;
 use core::write;
@@ -7,7 +7,7 @@ use num_traits::real::Real;
 
 type Polar = crate::complex::polar::ComplexPolar<FT>;
 type Rectangular = crate::complex::rectangular::Complex<FT>;
-type FT = f32;
+type FT = f64;
 
 impl Rectangular {
     pub const ZERO: Self = Self::new(0.0, 0.0);
@@ -100,7 +100,13 @@ impl Rectangular {
     /// Casts to a glam::Vec2.
     #[cfg(feature = "glam")]
     pub fn as_vec2(self) -> glam::Vec2 {
-        glam::vec2(self.re, self.im)
+        glam::vec2(self.re as f32, self.im as f32)
+    }
+
+    /// Casts to a glam::DVec2.
+    #[cfg(feature = "glam")]
+    pub fn as_dvec2(self) -> glam::DVec2 {
+        glam::dvec2(self.re, self.im)
     }
 }
 
@@ -352,6 +358,13 @@ impl From<FT> for Rectangular {
 #[cfg(feature = "glam")]
 impl From<glam::Vec2> for Rectangular {
     fn from(v: glam::Vec2) -> Self {
+        Self::new(v.x as FT, v.y as FT)
+    }
+}
+
+#[cfg(feature = "glam")]
+impl From<glam::DVec2> for Rectangular {
+    fn from(v: glam::DVec2) -> Self {
         Self::new(v.x, v.y)
     }
 }
@@ -363,11 +376,19 @@ impl From<Rectangular> for glam::Vec2 {
     }
 }
 
+#[cfg(feature = "glam")]
+impl From<Rectangular> for glam::DVec2 {
+    fn from(z: Rectangular) -> Self {
+        z.as_dvec2()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use approx::*;
-    use core::f32::consts::{E, FRAC_PI_2, PI, SQRT_2};
+    use core::f64::consts::{E, FRAC_PI_2, PI, SQRT_2};
     use core::iter::Iterator;
     use rand::{
         Rng, SeedableRng,

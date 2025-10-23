@@ -2,6 +2,10 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod f32;
+mod f32;
+mod f64;
+mod polar;
+mod rectangular;
 
-pub use f32::*;
+pub use polar::*;
+pub use rectangular::*;
