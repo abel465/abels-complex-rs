@@ -1,159 +1,15 @@
-use core::f32::consts::{LN_2, LN_10};
 use core::fmt;
 use core::ops::*;
 use core::write;
-#[cfg(feature = "libm")]
-use num_traits::real::Real;
 
 type Polar = crate::complex::polar::ComplexPolar<FT>;
 type Rectangular = crate::complex::rectangular::Complex<FT>;
 type FT = f32;
 
-impl Rectangular {
-    pub const ZERO: Self = Self::new(0.0, 0.0);
-    pub const ONE: Self = Self::new(1.0, 0.0);
-    pub const NEG_ONE: Self = Self::new(-1.0, 0.0);
-    pub const I: Self = Self::new(0.0, 1.0);
-    pub const NEG_I: Self = Self::new(0.0, -1.0);
-
-    /// Computes the conjugate.
-    pub const fn conjugate(self) -> Self {
-        Self::new(self.re, -self.im)
-    }
-
-    /// Computes the absolute value.
-    pub fn abs(self) -> FT {
-        self.abs_sq().sqrt()
-    }
-
-    /// Computes the squared absolute value.
-    ///
-    /// This is faster than `abs()` as it avoids a square root operation.
-    pub fn abs_sq(self) -> FT {
-        self.re * self.re + self.im * self.im
-    }
-
-    /// Computes the argument in the range `(-π, +π]`.
-    pub fn arg(self) -> FT {
-        self.im.atan2(self.re)
-    }
-
-    /// Computes the reciprocal.
-    pub fn recip(self) -> Self {
-        self.conjugate() / self.abs_sq()
-    }
-
-    /// Computes the principle square root.
-    pub fn sqrt(self) -> Self {
-        let abs = self.abs();
-        Self::new(
-            (0.5 * (abs + self.re)).sqrt(),
-            (0.5 * (abs - self.re)).sqrt().copysign(self.im),
-        )
-    }
-
-    /// Convert to polar form.
-    pub fn to_polar(self) -> Polar {
-        Polar::new(self.abs(), self.arg())
-    }
-
-    /// Computes `e^self` where `e` is the base of the natural logarithm.
-    pub fn exp(self) -> Polar {
-        Polar::new(self.re.exp(), self.im)
-    }
-
-    /// Computes the principle natural logarithm.
-    pub fn ln(self) -> Self {
-        self.to_polar().ln()
-    }
-
-    /// Computes the principle logarithm in base 2.
-    pub fn log2(self) -> Self {
-        self.ln() / LN_2
-    }
-
-    /// Computes the principle logarithm in base 10.
-    pub fn log10(self) -> Self {
-        self.ln() / LN_10
-    }
-
-    /// Raises `self` to an integer power.
-    pub fn powi(self, n: i32) -> Polar {
-        self.to_polar().powi(n)
-    }
-
-    /// Raises `self` to a floating point power.
-    pub fn powf(self, x: FT) -> Polar {
-        self.to_polar().powf(x)
-    }
-
-    /// Computes the euclidian distance between two points.
-    pub fn distance(self, other: Self) -> FT {
-        (self - other).abs()
-    }
-
-    /// Computes the squared euclidian distance between two points.
-    pub fn distance_squared(self, other: Self) -> FT {
-        (self - other).abs_sq()
-    }
-
-    /// Casts to a glam::Vec2.
-    #[cfg(feature = "glam")]
-    pub fn as_vec2(self) -> glam::Vec2 {
-        glam::vec2(self.re, self.im)
-    }
-}
-
-impl Add for Rectangular {
-    type Output = Self;
-    fn add(mut self, other: Self) -> Self::Output {
-        self += other;
-        self
-    }
-}
-
-impl Add<FT> for Rectangular {
-    type Output = Self;
-    fn add(mut self, re: FT) -> Self::Output {
-        self += re;
-        self
-    }
-}
-
 impl Add<Rectangular> for FT {
     type Output = Rectangular;
-    fn add(self, mut z: Self::Output) -> Self::Output {
-        z += self;
-        z
-    }
-}
-
-impl AddAssign for Rectangular {
-    fn add_assign(&mut self, other: Self) {
-        self.re += other.re;
-        self.im += other.im;
-    }
-}
-
-impl AddAssign<FT> for Rectangular {
-    fn add_assign(&mut self, re: FT) {
-        self.re += re;
-    }
-}
-
-impl Sub for Rectangular {
-    type Output = Self;
-    fn sub(mut self, other: Self) -> Self::Output {
-        self -= other;
-        self
-    }
-}
-
-impl Sub<FT> for Rectangular {
-    type Output = Self;
-    fn sub(mut self, re: FT) -> Self::Output {
-        self -= re;
-        self
+    fn add(self, z: Self::Output) -> Self::Output {
+        z + self
     }
 }
 
@@ -164,97 +20,28 @@ impl Sub<Rectangular> for FT {
     }
 }
 
-impl SubAssign for Rectangular {
-    fn sub_assign(&mut self, other: Self) {
-        self.re -= other.re;
-        self.im -= other.im;
-    }
-}
-
-impl SubAssign<FT> for Rectangular {
-    fn sub_assign(&mut self, re: FT) {
-        self.re -= re;
-    }
-}
-
-impl Mul for Rectangular {
-    type Output = Self;
-    fn mul(mut self, other: Self) -> Self {
-        self *= other;
-        self
-    }
-}
-
-impl Mul<FT> for Rectangular {
-    type Output = Self;
-    fn mul(mut self, re: FT) -> Self {
-        self *= re;
-        self
-    }
-}
-
 impl Mul<Rectangular> for FT {
     type Output = Rectangular;
-    fn mul(self, mut other: Self::Output) -> Self::Output {
-        other *= self;
-        other
-    }
-}
-
-impl MulAssign for Rectangular {
-    fn mul_assign(&mut self, other: Self) {
-        let re = self.re * other.re - self.im * other.im;
-        self.im = self.re * other.im + self.im * other.re;
-        self.re = re;
-    }
-}
-
-impl MulAssign<FT> for Rectangular {
-    fn mul_assign(&mut self, re: FT) {
-        self.re *= re;
-        self.im *= re;
-    }
-}
-
-impl Div for Rectangular {
-    type Output = Self;
-    fn div(self, other: Self) -> Self::Output {
-        self * other.recip()
-    }
-}
-
-impl Div<FT> for Rectangular {
-    type Output = Self;
-    fn div(mut self, re: FT) -> Self::Output {
-        self /= re;
-        self
+    fn mul(self, z: Self::Output) -> Self::Output {
+        z * self
     }
 }
 
 impl Div<Rectangular> for FT {
     type Output = Rectangular;
-    fn div(self, other: Self::Output) -> Self::Output {
-        self * other.recip()
+    fn div(self, z: Self::Output) -> Self::Output {
+        self * z.recip()
     }
 }
 
-impl DivAssign for Rectangular {
-    fn div_assign(&mut self, other: Self) {
-        *self = *self / other;
-    }
-}
+impl Rectangular {
+    pub const NEG_ONE: Self = Self::new(-1.0, 0.0);
+    pub const NEG_I: Self = Self::new(0.0, -1.0);
 
-impl DivAssign<FT> for Rectangular {
-    fn div_assign(&mut self, re: FT) {
-        self.re /= re;
-        self.im /= re;
-    }
-}
-
-impl Neg for Rectangular {
-    type Output = Self;
-    fn neg(self) -> Self::Output {
-        Self::new(-self.re, -self.im)
+    /// Casts to a glam::Vec2.
+    #[cfg(feature = "glam")]
+    pub fn as_vec2(self) -> glam::Vec2 {
+        glam::vec2(self.re, self.im)
     }
 }
 
@@ -298,54 +85,6 @@ impl fmt::Display for Rectangular {
 impl rand::distr::Distribution<Rectangular> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Rectangular {
         rng.sample::<Polar, _>(self).to_rectangular()
-    }
-}
-
-#[cfg(feature = "approx")]
-use approx::{AbsDiffEq, RelativeEq, UlpsEq};
-
-#[cfg(feature = "approx")]
-impl AbsDiffEq for Rectangular {
-    type Epsilon = <FT as AbsDiffEq>::Epsilon;
-    fn default_epsilon() -> Self::Epsilon {
-        FT::default_epsilon()
-    }
-    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        FT::abs_diff_eq(&self.re, &other.re, epsilon)
-            && FT::abs_diff_eq(&self.im, &other.im, epsilon)
-    }
-}
-
-#[cfg(feature = "approx")]
-impl RelativeEq for Rectangular {
-    fn default_max_relative() -> Self::Epsilon {
-        FT::default_max_relative()
-    }
-    fn relative_eq(
-        &self,
-        other: &Self,
-        epsilon: Self::Epsilon,
-        max_relative: Self::Epsilon,
-    ) -> bool {
-        FT::relative_eq(&self.re, &other.re, epsilon, max_relative)
-            && FT::relative_eq(&self.im, &other.im, epsilon, max_relative)
-    }
-}
-
-#[cfg(feature = "approx")]
-impl UlpsEq for Rectangular {
-    fn default_max_ulps() -> u32 {
-        FT::default_max_ulps()
-    }
-    fn ulps_eq(&self, other: &Self, epsilon: Self::Epsilon, max_ulps: u32) -> bool {
-        FT::ulps_eq(&self.re, &other.re, epsilon, max_ulps)
-            && FT::ulps_eq(&self.im, &other.im, epsilon, max_ulps)
-    }
-}
-
-impl From<FT> for Rectangular {
-    fn from(value: FT) -> Self {
-        Self::new(value, 0.0)
     }
 }
 
