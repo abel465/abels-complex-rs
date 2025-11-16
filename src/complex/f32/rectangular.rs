@@ -115,12 +115,13 @@ mod tests {
     };
 
     const NUM_SAMPLES: usize = 100;
+    const SEED: u64 = 21;
 
     fn random_samples<T>() -> impl Iterator<Item = T>
     where
         StandardUniform: Distribution<T>,
     {
-        StdRng::seed_from_u64(21)
+        StdRng::seed_from_u64(SEED)
             .sample_iter(StandardUniform)
             .take(NUM_SAMPLES)
     }

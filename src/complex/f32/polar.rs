@@ -1,7 +1,5 @@
 use core::f32::consts::{FRAC_PI_2, PI};
 use core::ops::*;
-#[cfg(feature = "libm")]
-use num_traits::real::Real;
 
 type Polar = crate::complex::polar::ComplexPolar<FT>;
 type FT = f32;
@@ -48,12 +46,13 @@ mod tests {
     type Rectangular = crate::complex::rectangular::Complex<FT>;
 
     const NUM_SAMPLES: usize = 100;
+    const SEED: u64 = 21;
 
     fn random_samples<T>() -> impl core::iter::Iterator<Item = T>
     where
         StandardUniform: Distribution<T>,
     {
-        StdRng::seed_from_u64(21)
+        StdRng::seed_from_u64(SEED)
             .sample_iter(StandardUniform)
             .take(NUM_SAMPLES)
     }
@@ -62,7 +61,7 @@ mod tests {
     where
         T: SampleUniform,
     {
-        StdRng::seed_from_u64(21)
+        StdRng::seed_from_u64(SEED)
             .sample_iter(Uniform::new(low, high).unwrap())
             .take(NUM_SAMPLES)
     }

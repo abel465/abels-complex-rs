@@ -120,12 +120,10 @@ impl<FT: Number> ComplexPolar<FT> {
             } else {
                 self.arg -= FT::PI();
             }
-        } else {
-            if self.arg > FT::PI() {
-                self.arg -= FT::TAU();
-            } else if self.arg <= -FT::PI() {
-                self.arg += FT::TAU();
-            }
+        } else if self.arg > FT::PI() {
+            self.arg -= FT::TAU();
+        } else if self.arg <= -FT::PI() {
+            self.arg += FT::TAU();
         }
         self
     }
