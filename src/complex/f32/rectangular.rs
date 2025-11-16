@@ -106,7 +106,7 @@ impl From<Rectangular> for glam::Vec2 {
 mod tests {
     use super::*;
     use approx::*;
-    use core::f32::consts::{E, FRAC_PI_2, PI, SQRT_2};
+    use core::f32::consts::{E, FRAC_PI_2, LN_2, PI, SQRT_2};
     use core::iter::Iterator;
     use rand::{
         Rng, SeedableRng,
@@ -350,6 +350,19 @@ mod tests {
         assert_eq!(Rectangular::I.exp(), Polar::new(1.0, 1.0));
         assert_eq!(Rectangular::NEG_ONE.exp(), Polar::new(E.recip(), 0.0));
         assert_eq!(Rectangular::NEG_I.exp(), Polar::new(1.0, -1.0));
+    }
+
+    #[test]
+    fn exp2() {
+        for z in random_samples::<Rectangular>() {
+            assert_eq!(z.exp2().abs, z.re.exp2());
+            assert_eq!(z.exp2().arg, z.im * LN_2);
+            assert_ulps_eq!(z.exp2().log2(), z);
+        }
+        assert_eq!(Rectangular::ONE.exp2(), Polar::new(2.0, 0.0));
+        assert_eq!(Rectangular::I.exp2(), Polar::new(1.0, LN_2));
+        assert_eq!(Rectangular::NEG_ONE.exp2(), Polar::new(0.5, 0.0));
+        assert_eq!(Rectangular::NEG_I.exp2(), Polar::new(1.0, -LN_2));
     }
 
     #[test]

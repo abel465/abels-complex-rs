@@ -68,6 +68,11 @@ impl<FT: Number> Complex<FT> {
         Polar::new(self.re.exp(), self.im)
     }
 
+    /// Computes `2^self`.
+    pub fn exp2(self) -> Polar<FT> {
+        Polar::new(self.re.exp2(), self.im * FT::LN_2())
+    }
+
     /// Computes the principle natural logarithm.
     pub fn ln(self) -> Self {
         self.to_polar().ln()
