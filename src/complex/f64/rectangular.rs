@@ -2,6 +2,7 @@ use core::fmt;
 use core::ops::*;
 use core::write;
 
+#[allow(dead_code)]
 type Polar = crate::complex::polar::ComplexPolar<FT>;
 type Rectangular = crate::complex::rectangular::Complex<FT>;
 type FT = f64;
