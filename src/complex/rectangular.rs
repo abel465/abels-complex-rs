@@ -41,6 +41,14 @@ impl<FT: Number> Complex<FT> {
         self.abs_sq().sqrt()
     }
 
+    pub fn square(mut self) -> Self {
+        let two = FT::ONE + FT::ONE;
+        let re = self.re * self.re - self.im * self.im;
+        self.im = self.re * self.im * two;
+        self.re = re;
+        self
+    }
+
     /// Computes the squared absolute value.
     ///
     /// This is faster than `abs()` as it avoids a square root operation.
