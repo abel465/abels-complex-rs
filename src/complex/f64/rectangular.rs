@@ -91,6 +91,7 @@ impl fmt::Display for Rectangular {
 #[cfg(feature = "rand")]
 impl rand::distr::Distribution<Rectangular> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Rectangular {
+        use rand::RngExt;
         rng.sample::<Polar, _>(self).to_rectangular()
     }
 }
@@ -130,7 +131,7 @@ mod tests {
     use core::f64::consts::{E, FRAC_PI_2, PI, SQRT_2};
     use core::iter::Iterator;
     use rand::{
-        Rng, SeedableRng,
+        RngExt, SeedableRng,
         distr::{Distribution, StandardUniform},
         rngs::StdRng,
     };

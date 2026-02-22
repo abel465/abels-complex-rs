@@ -28,6 +28,7 @@ impl Polar {
 #[cfg(feature = "rand")]
 impl rand::distr::Distribution<Polar> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Polar {
+        use rand::RngExt;
         Polar::new(self.sample(rng), rng.random_range((-PI).next_up()..=PI))
     }
 }
@@ -38,7 +39,7 @@ mod tests {
     use approx::*;
     use core::f64::consts::{E, TAU};
     use rand::{
-        Rng, SeedableRng,
+        RngExt, SeedableRng,
         distr::{Distribution, StandardUniform, Uniform, uniform::*},
         rngs::StdRng,
     };
