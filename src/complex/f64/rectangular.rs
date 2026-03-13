@@ -128,7 +128,7 @@ impl From<Rectangular> for glam::DVec2 {
 mod tests {
     use super::*;
     use approx::*;
-    use core::f64::consts::{E, FRAC_PI_2, PI, SQRT_2};
+    use core::f64::consts::{E, FRAC_PI_2, FRAC_PI_4, LN_2, PI, SQRT_2};
     use core::iter::Iterator;
     use rand::{
         RngExt, SeedableRng,
@@ -390,6 +390,25 @@ mod tests {
         assert_ulps_eq!(Rectangular::new(E, 0.0).ln(), Rectangular::ONE);
         assert_ulps_eq!(Rectangular::new(2.0, 0.0).log2(), Rectangular::ONE);
         assert_ulps_eq!(Rectangular::new(10.0, 0.0).log10(), Rectangular::ONE);
+    }
+
+    #[test]
+    fn ln_1p() {
+        for z in random_samples::<Rectangular>() {
+            // (z + 1).ln() is unreliable near the singularity at z = -1
+            let z = Rectangular::new(z.re.max(-0.75), z.im);
+            assert_ulps_eq!(z.ln_1p(), (z + 1.0).ln(), max_ulps = 2);
+        }
+        assert_eq!(Rectangular::ZERO.ln_1p(), Rectangular::ZERO);
+        assert_ulps_eq!(Rectangular::ONE.ln_1p(), Rectangular::new(LN_2, 0.0));
+        assert_ulps_eq!(
+            Rectangular::I.ln_1p(),
+            Rectangular::new(LN_2 / 2.0, FRAC_PI_4)
+        );
+        // Near zero: (z + 1).ln() loses all precision, ln_1p preserves it
+        let tiny = Rectangular::new(1e-16, 0.0);
+        assert_eq!((tiny + 1.0).ln(), Rectangular::ZERO); // 1.0 + 1e-16 == 1.0 in f64
+        assert_ne!(tiny.ln_1p(), Rectangular::ZERO);
     }
 
     #[test]

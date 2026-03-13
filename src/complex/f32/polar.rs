@@ -37,7 +37,7 @@ impl rand::distr::Distribution<Polar> for rand::distr::StandardUniform {
 mod tests {
     use super::*;
     use approx::*;
-    use core::f32::consts::{E, LN_2, TAU};
+    use core::f32::consts::{E, FRAC_PI_4, LN_2, TAU};
     use rand::{
         RngExt, SeedableRng,
         distr::{Distribution, StandardUniform, Uniform, uniform::*},
@@ -230,6 +230,20 @@ mod tests {
         assert_ulps_eq!(Polar::new(E, 0.0).ln(), Rectangular::ONE);
         assert_ulps_eq!(Polar::new(2.0, 0.0).log2(), Rectangular::ONE);
         assert_ulps_eq!(Polar::new(10.0, 0.0).log10(), Rectangular::ONE);
+    }
+
+    #[test]
+    fn ln_1p() {
+        for z in random_samples::<Polar>() {
+            assert_ulps_eq!(
+                z.ln_1p(),
+                z.to_rectangular().ln_1p(),
+                epsilon = 2.0 * FT::EPSILON
+            );
+        }
+        assert_eq!(Polar::ZERO.ln_1p(), Rectangular::ZERO);
+        assert_ulps_eq!(Polar::ONE.ln_1p(), Rectangular::new(LN_2, 0.0));
+        assert_ulps_eq!(Polar::I.ln_1p(), Rectangular::new(LN_2 / 2.0, FRAC_PI_4));
     }
 
     #[test]

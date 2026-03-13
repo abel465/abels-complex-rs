@@ -32,7 +32,7 @@ impl<FT: Number> ComplexPolar<FT> {
     pub const ZERO: Self = Self::new(FT::ZERO, FT::ZERO);
     pub const ONE: Self = Self::new(FT::ONE, FT::ZERO);
 
-    /// Computes the conjugate.                        
+    /// Computes the conjugate.
     pub fn conjugate(self) -> Self {
         Self::new(self.abs, -self.arg)
     }
@@ -57,7 +57,7 @@ impl<FT: Number> ComplexPolar<FT> {
         Self::new(self.abs.recip(), -self.arg)
     }
 
-    /// Computes the principle square root.
+    /// Computes the principal square root.
     pub fn sqrt(self) -> Self {
         let two = FT::ONE + FT::ONE;
         Self::new(self.abs.sqrt(), self.arg / two)
@@ -79,17 +79,24 @@ impl<FT: Number> ComplexPolar<FT> {
         self.to_rectangular().exp2()
     }
 
-    /// Computes the principle natural logarithm.
+    /// Computes the principal natural logarithm.
     pub fn ln(self) -> Rectangular<FT> {
         Rectangular::new(self.abs.ln(), self.arg)
     }
 
-    /// Computes the principle logarithm in base 2.
+    /// Computes the principal natural logarithm of `1 + self`.
+    ///
+    /// More numerically stable than `(self + 1).ln()` when `self ≈ 0`.
+    pub fn ln_1p(self) -> Rectangular<FT> {
+        self.to_rectangular().ln_1p()
+    }
+
+    /// Computes the principal logarithm in base 2.
     pub fn log2(self) -> Rectangular<FT> {
         self.ln() / FT::LN_2()
     }
 
-    /// Computes the principle logarithm in base 10.
+    /// Computes the principal logarithm in base 10.
     pub fn log10(self) -> Rectangular<FT> {
         self.ln() / FT::LN_10()
     }

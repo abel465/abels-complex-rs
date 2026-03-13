@@ -81,17 +81,27 @@ impl<FT: Number> Complex<FT> {
         Polar::new(self.re.exp2(), self.im * FT::LN_2())
     }
 
-    /// Computes the principle natural logarithm.
+    /// Computes the principal natural logarithm.
     pub fn ln(self) -> Self {
         self.to_polar().ln()
     }
 
-    /// Computes the principle logarithm in base 2.
+    /// Computes the principal natural logarithm of `1 + self`.
+    ///
+    /// More numerically stable than `(self + 1).ln()` when `self ≈ 0`.
+    pub fn ln_1p(self) -> Self {
+        let two = FT::ONE + FT::ONE;
+        let re = (two * self.re + self.abs_sq()).ln_1p() / two;
+        let im = (self + FT::ONE).arg();
+        Self::new(re, im)
+    }
+
+    /// Computes the principal logarithm in base 2.
     pub fn log2(self) -> Self {
         self.ln() / FT::LN_2()
     }
 
-    /// Computes the principle logarithm in base 10.
+    /// Computes the principal logarithm in base 10.
     pub fn log10(self) -> Self {
         self.ln() / FT::LN_10()
     }
@@ -106,7 +116,7 @@ impl<FT: Number> Complex<FT> {
         self.to_polar().powf(x)
     }
 
-    /// Computes the principle square root.
+    /// Computes the principal square root.
     pub fn sqrt(self) -> Self {
         let two = FT::ONE + FT::ONE;
         let abs = self.abs();
