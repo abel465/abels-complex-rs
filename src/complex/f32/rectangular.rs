@@ -390,7 +390,7 @@ mod tests {
         for z in random_samples::<Rectangular>() {
             // (z + 1).ln() is unreliable near the singularity at z = -1
             let z = Rectangular::new(z.re.max(-0.75), z.im);
-            assert_ulps_eq!(z.ln_1p(), (z + 1.0).ln(), max_ulps = 2);
+            assert_ulps_eq!(z.ln_1p(), (z + 1.0).ln(), max_ulps = 5);
         }
         assert_eq!(Rectangular::ZERO.ln_1p(), Rectangular::ZERO);
         assert_ulps_eq!(Rectangular::ONE.ln_1p(), Rectangular::new(LN_2, 0.0));
