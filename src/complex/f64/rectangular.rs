@@ -376,6 +376,23 @@ mod tests {
     }
 
     #[test]
+    fn expm1() {
+        for z in random_samples::<Rectangular>() {
+            assert_ulps_eq!(z.expm1(), z.exp().to_rectangular() - 1.0, max_ulps = 5);
+        }
+        assert_eq!(Rectangular::ZERO.expm1(), Rectangular::ZERO);
+        assert_ulps_eq!(Rectangular::ONE.expm1(), Rectangular::new(E - 1.0, 0.0));
+        assert_ulps_eq!(
+            Rectangular::I.expm1(),
+            Rectangular::I.exp().to_rectangular() - 1.0
+        );
+
+        let tiny = Rectangular::new(1e-16, 0.0);
+        assert_eq!(tiny.exp().to_rectangular() - 1.0, Rectangular::ZERO);
+        assert_ne!(tiny.expm1(), Rectangular::ZERO);
+    }
+
+    #[test]
     fn log() {
         for z in random_samples::<Rectangular>() {
             assert_eq!(z.ln().re, z.abs().ln());

@@ -203,6 +203,16 @@ mod tests {
     }
 
     #[test]
+    fn expm1() {
+        for z in random_samples::<Polar>() {
+            assert_ulps_eq!(z.expm1(), z.to_rectangular().expm1(), max_ulps = 2);
+        }
+        assert_eq!(Polar::ZERO.expm1(), Rectangular::ZERO);
+        assert_ulps_eq!(Polar::ONE.expm1(), Rectangular::new(E - 1.0, 0.0));
+        assert_ulps_eq!(Polar::I.expm1(), Polar::I.exp().to_rectangular() - 1.0);
+    }
+
+    #[test]
     fn log() {
         for z in random_samples::<Polar>() {
             assert_eq!(z.ln().re, z.abs.ln());

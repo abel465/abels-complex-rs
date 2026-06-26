@@ -81,6 +81,18 @@ impl<FT: Number> Complex<FT> {
         Polar::new(self.re.exp2(), self.im * FT::LN_2())
     }
 
+    /// Computes `e^self - 1`.
+    ///
+    /// More numerically stable than `self.exp().to_rectangular() - 1` when `self ≈ 0`.
+    pub fn expm1(self) -> Self {
+        let two = FT::ONE + FT::ONE;
+        let (sin, cos) = self.im.sin_cos();
+        Self::new(
+            self.re.exp_m1() * cos - two * (self.im / two).sin().powi(2),
+            self.re.exp() * sin,
+        )
+    }
+
     /// Computes the principal natural logarithm.
     pub fn ln(self) -> Self {
         self.to_polar().ln()

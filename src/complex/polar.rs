@@ -79,6 +79,13 @@ impl<FT: Number> ComplexPolar<FT> {
         self.to_rectangular().exp2()
     }
 
+    /// Computes `e^self - 1`.
+    ///
+    /// More numerically stable than `self.exp().to_rectangular() - 1` when `self ≈ 0`.
+    pub fn expm1(self) -> Rectangular<FT> {
+        self.to_rectangular().expm1()
+    }
+
     /// Computes the principal natural logarithm.
     pub fn ln(self) -> Rectangular<FT> {
         Rectangular::new(self.abs.ln(), self.arg)
