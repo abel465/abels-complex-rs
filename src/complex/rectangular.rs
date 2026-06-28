@@ -328,3 +328,47 @@ where
             && FT::ulps_eq(&self.im, &other.im, epsilon, max_ulps)
     }
 }
+
+impl<FT: num_traits::AsPrimitive<f32>> Complex<FT> {
+    /// Casts to a glam::Vec2.
+    #[cfg(feature = "glam")]
+    pub fn as_vec2(self) -> glam::Vec2 {
+        glam::vec2(self.re.as_(), self.im.as_())
+    }
+}
+
+impl<FT: num_traits::AsPrimitive<f64>> Complex<FT> {
+    /// Casts to a glam::DVec2.
+    #[cfg(feature = "glam")]
+    pub fn as_dvec2(self) -> glam::DVec2 {
+        glam::dvec2(self.re.as_(), self.im.as_())
+    }
+}
+
+#[cfg(feature = "glam")]
+impl<T: From<f32>> From<glam::Vec2> for Complex<T> {
+    fn from(v: glam::Vec2) -> Self {
+        Self::new(v.x.into(), v.y.into())
+    }
+}
+
+#[cfg(feature = "glam")]
+impl<T: Into<f32>> From<Complex<T>> for glam::Vec2 {
+    fn from(z: Complex<T>) -> Self {
+        glam::vec2(z.re.into(), z.im.into())
+    }
+}
+
+#[cfg(feature = "glam")]
+impl<T: From<f64>> From<glam::DVec2> for Complex<T> {
+    fn from(v: glam::DVec2) -> Self {
+        Self::new(v.x.into(), v.y.into())
+    }
+}
+
+#[cfg(feature = "glam")]
+impl<T: Into<f64>> From<Complex<T>> for glam::DVec2 {
+    fn from(z: Complex<T>) -> Self {
+        glam::dvec2(z.re.into(), z.im.into())
+    }
+}

@@ -38,12 +38,6 @@ impl Div<Rectangular> for FT {
 impl Rectangular {
     pub const NEG_ONE: Self = Self::new(-1.0, 0.0);
     pub const NEG_I: Self = Self::new(0.0, -1.0);
-
-    /// Casts to a glam::Vec2.
-    #[cfg(feature = "glam")]
-    pub fn as_vec2(self) -> glam::Vec2 {
-        glam::vec2(self.re, self.im)
-    }
 }
 
 impl fmt::Display for Rectangular {
@@ -87,20 +81,6 @@ impl rand::distr::Distribution<Rectangular> for rand::distr::StandardUniform {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Rectangular {
         use rand::RngExt;
         rng.sample::<Polar, _>(self).to_rectangular()
-    }
-}
-
-#[cfg(feature = "glam")]
-impl From<glam::Vec2> for Rectangular {
-    fn from(v: glam::Vec2) -> Self {
-        Self::new(v.x, v.y)
-    }
-}
-
-#[cfg(feature = "glam")]
-impl From<Rectangular> for glam::Vec2 {
-    fn from(z: Rectangular) -> Self {
-        z.as_vec2()
     }
 }
 
