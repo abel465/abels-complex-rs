@@ -152,6 +152,11 @@ impl<FT: Number> Complex<FT> {
     pub fn lerp(self, other: Self, t: FT) -> Self {
         self + (other - self) * t
     }
+
+    /// Returns whether both the real and imaginary component are finite.
+    pub fn is_finite(self) -> bool {
+        self.re.is_finite() && self.im.is_finite()
+    }
 }
 
 impl<FT: Number> Add for Complex<FT> {

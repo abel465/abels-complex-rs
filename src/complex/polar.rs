@@ -141,6 +141,11 @@ impl<FT: Number> ComplexPolar<FT> {
         }
         self
     }
+
+    /// Returns whether both the absolute value and argument are finite.
+    pub fn is_finite(self) -> bool {
+        self.abs.is_finite() && self.arg.is_finite()
+    }
 }
 
 impl<FT: Number> Mul for ComplexPolar<FT> {
